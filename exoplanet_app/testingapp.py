@@ -8,7 +8,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
-import torch
 import pickle
 import io
 
@@ -256,4 +255,5 @@ with tab3:
                         st.write("Predictions:", preds)
 
             except Exception as e:
+
                 st.error(f"Error while loading model or predicting: {e}")
