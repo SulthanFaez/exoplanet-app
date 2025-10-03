@@ -107,23 +107,41 @@ with tab1:
     else:
         csv_data = None
 
-    if st.button("Predict"):
-        if csv_data is not None:
-            input_data = prepare_data(csv_data)
-        else:
-            input_data = prepare_data(manual_data)
+if st.button("Predict"):
+    if csv_data is not None:
+        input_data = prepare_data(csv_data)
+    else:
+        input_data = prepare_data(manual_data)
 
-        preds = model.predict(input_data)
-        pred_proba = model.predict_proba(input_data)
+    X = input_data.values  # make sure it's a NumPy array
 
-        pred_labels = [label_map[p] for p in preds]
-        result_df = pd.DataFrame(pred_labels, columns=["Prediction"])
-        prob_df = pd.DataFrame(np.round(pred_proba, 3), columns=[label_map[c] for c in model.classes_])
+    chunk_size = 100
+    all_preds = []
+    all_probs = []
 
-        st.header("Predictions")
-        st.dataframe(pd.concat([result_df, prob_df], axis=1))
+    # Loop in batches
+    for start in range(0, len(X), chunk_size):
+        batch = X[start:start + chunk_size]
+        batch_preds = model.predict(batch)
+        batch_probs = model.predict_proba(batch)
+        all_preds.extend(batch_preds)
+        all_probs.extend(batch_probs)
 
-        st.success("Prediction complete!")
+    preds = np.array(all_preds)
+    pred_proba = np.array(all_probs)
+
+    # Map predictions to labels
+    pred_labels = [label_map[p] for p in preds]
+
+    # Create DataFrames
+    result_df = pd.DataFrame(pred_labels, columns=["Prediction"])
+    prob_df = pd.DataFrame(np.round(pred_proba, 3), columns=[label_map[c] for c in model.classes_])
+
+    # Display in Streamlit
+    st.header("Predictions")
+    st.dataframe(pd.concat([result_df, prob_df], axis=1))
+
+    st.success("Prediction complete!")
 
 
 with tab2:
@@ -265,6 +283,7 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
 
 
 
