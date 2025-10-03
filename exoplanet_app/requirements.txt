@@ -1,6 +1,9 @@
 streamlit
-pandas
-numpy
-scikit-learn
-xgboost
-joblib
+pandas==2.3.2
+numpy==1.26.4
+scikit-learn==1.6.1
+xgboost==3.0.5
+joblib==1.5.2
+matplotlib==3.10.1
+seaborn==0.13.2
+tabpfn==2.2.1
