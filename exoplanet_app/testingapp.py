@@ -22,7 +22,7 @@ def load_default_model():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pth")
     model = torch.load(model_path, map_location="cpu", weights_only=False)
-    model.devices_ = ["cpu"]        # devices list
+    model.devices_ = [torch.device("cpu")]        # devices list
     model.use_cuda = False
     return model
 
@@ -265,5 +265,6 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
 
 
