@@ -8,14 +8,21 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+import torch
 import pickle
 import io
 
 @st.cache_resource
+# def load_default_model():
+#     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+#     model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pkl")  # your trained model
+#     return joblib.load(model_path)
+
 def load_default_model():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pkl")  # your trained model
-    return joblib.load(model_path)
+    model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pth")
+    model = torch.load(model_path, map_location="cpu", weights_only=False)
+    return model
 
 def load_model_file(uploaded_file):
     return joblib.load(uploaded_file)
@@ -219,7 +226,7 @@ with tab2:
             st.error("Please upload a training CSV first.")
 
 with tab3:
-    st.header("🔄 Load Pretrained Model and Predict")
+    st.header("Load Pretrained Model and Predict")
 
     model_file = st.file_uploader("Upload your trained model (.pkl)", type=["pkl"])
     data_file = st.file_uploader("Upload CSV for Prediction", type=["csv"])
@@ -255,5 +262,4 @@ with tab3:
                         st.write("Predictions:", preds)
 
             except Exception as e:
-
                 st.error(f"Error while loading model or predicting: {e}")
