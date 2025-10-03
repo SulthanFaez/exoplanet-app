@@ -4,3 +4,6 @@ numpy
 scikit-learn
 xgboost
 joblib
+matplotlib
+seaborn
+torch
