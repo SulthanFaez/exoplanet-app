@@ -14,29 +14,35 @@ import io
 import threading
 
 
-# def load_default_model():
-#     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-#     model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pkl")  # your trained model
-#     return joblib.load(model_path)
-
-model = None
-
-
 def load_default_model():
-    import torch
-    import os
-    global model
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pth")
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = torch.load(model_path, map_location=device, weights_only=False)
-    model.devices_ = [device]
-    model.use_cuda = torch.cuda.is_available()
+    model_path = os.path.join(BASE_DIR, "xgbexoplanet.pkl")  # your trained model
+    return joblib.load(model_path)
+
+# model = None
+
+
+# def load_default_model():
+#     import torch
+#     import os
+#     global model
+#     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+#     model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pth")
+#     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#     model = torch.load(model_path, map_location=device, weights_only=False)
+#     model.devices_ = [device]
+#     model.use_cuda = torch.cuda.is_available()
 
 # Start loading in background
-load_default_model()
+model = load_default_model()
+# threading.Thread(target=load_default_model, daemon=True).start()
 
 st.title("🔭 Trigospace Exoplanet Classifier")
+
+# if model:
+#     st.success("Model loaded!")
+# else:
+#     st.info("Loading model in background… please wait.")
 
 
 # def load_default_model():
@@ -128,41 +134,24 @@ with tab1:
     else:
         csv_data = None
 
-if st.button("Predict"):
-    if csv_data is not None:
-        input_data = prepare_data(csv_data)
-    else:
-        input_data = prepare_data(manual_data)
+    if st.button("Predict"):
+        if csv_data is not None:
+            input_data = prepare_data(csv_data)
+        else:
+            input_data = prepare_data(manual_data)
 
-    X = input_data  # make sure it's a NumPy array
+        preds = model.predict(input_data)
+        pred_proba = model.predict_proba(input_data)
 
-    chunk_size = 32
-    all_preds = []
-    all_probs = []
+        # Map numerical predictions to human-readable labels
+        pred_labels = [label_map[p] for p in preds]
+        result_df = pd.DataFrame(pred_labels, columns=["Prediction"])
+        prob_df = pd.DataFrame(np.round(pred_proba, 3), columns=[label_map[c] for c in model.classes_])
 
-    # Loop in batches
-    for start in range(0, len(X), chunk_size):
-        batch = X[start:start + chunk_size]
-        batch_preds = model.predict(batch)
-        batch_probs = model.predict_proba(batch)
-        all_preds.extend(batch_preds)
-        all_probs.extend(batch_probs)
+        st.header("Predictions")
+        st.dataframe(pd.concat([result_df, prob_df], axis=1))
 
-    preds = np.array(all_preds)
-    pred_proba = np.array(all_probs)
-
-    # Map predictions to labels
-    pred_labels = [label_map[p] for p in preds]
-
-    # Create DataFrames
-    result_df = pd.DataFrame(pred_labels, columns=["Prediction"])
-    prob_df = pd.DataFrame(np.round(pred_proba, 3), columns=[label_map[c] for c in model.classes_])
-
-    # Display in Streamlit
-    st.header("Predictions")
-    st.dataframe(pd.concat([result_df, prob_df], axis=1))
-
-    st.success("Prediction complete!")
+        st.success("Prediction complete!")
 
 
 with tab2:
@@ -304,11 +293,3 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
-
-
-
-
-
-
-
-
