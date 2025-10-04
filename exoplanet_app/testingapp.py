@@ -23,6 +23,7 @@ def load_tabpfn_model():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pth")  # your trained model
     temp_model = torch.load(model_path, weights_only=False, map_location=torch.device("cpu"))
+    temp_model.device = torch.device("cpu")
     return temp_model
 
 # model = None
@@ -312,6 +313,7 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
 
 
 
