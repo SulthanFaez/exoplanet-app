@@ -113,7 +113,7 @@ if st.button("Predict"):
     else:
         input_data = prepare_data(manual_data)
 
-    X = input_data.values  # make sure it's a NumPy array
+    X = input_data  # make sure it's a NumPy array
 
     chunk_size = 100
     all_preds = []
@@ -283,6 +283,7 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
 
 
 
