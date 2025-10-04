@@ -18,20 +18,44 @@ import io
 #     model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pkl")  # your trained model
 #     return joblib.load(model_path)
 
+import threading
 
+model_holder = {}
 
 def load_default_model():
+    import torch
+    import os
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pth")
-    model = torch.load(model_path, map_location="cuda", weights_only=False)
-    model.devices_ = [torch.device("cuda")]        # devices list
-    model.use_cuda = True
-    return model
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = torch.load(model_path, map_location=device, weights_only=False)
+    model.devices_ = [device]
+    model.use_cuda = torch.cuda.is_available()
+    model_holder["model"] = model
+
+# Start loading in background
+threading.Thread(target=load_default_model).start()
+
+st.title("🔭 Trigospace Exoplanet Classifier")
+
+if "model" in model_holder:
+    st.success("Model loaded!")
+else:
+    st.info("Loading model in background… please wait.")
+
+
+# def load_default_model():
+#     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+#     model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pth")
+#     model = torch.load(model_path, map_location="cuda", weights_only=False)
+#     model.devices_ = [torch.device("cuda")]        # devices list
+#     model.use_cuda = True
+#     return model
 
 def load_model_file(uploaded_file):
     return joblib.load(uploaded_file)
 
-model = load_default_model()
+# model = load_default_model()
 
 expected_features = [
     'koi_period', 'koi_time0bk', 'koi_impact',
@@ -61,7 +85,7 @@ def plot_confusion_matrix(cm, class_names):
     st.pyplot(fig)
 
 
-st.title("🔭 Trigospace Exoplanet Classifier")
+# st.title("🔭 Trigospace Exoplanet Classifier")
 
 tab1, tab2, tab3 = st.tabs(["Predict", "Train / Retrain Model", "Load & Predict"])
 
@@ -285,6 +309,7 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
 
 
 
