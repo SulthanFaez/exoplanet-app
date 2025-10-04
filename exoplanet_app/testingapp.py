@@ -95,7 +95,7 @@ def plot_confusion_matrix(cm, class_names):
 # st.title("🔭 Trigospace Exoplanet Classifier")
 
 tab1, tab2, tab3 = st.tabs(["Predict", "Train / Retrain Model", "Load & Predict"])
-
+model = None
 with tab1:
     st.header("Predict Exoplanet Candidate")
 
@@ -311,6 +311,7 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
 
 
 
