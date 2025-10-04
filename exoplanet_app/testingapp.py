@@ -104,7 +104,7 @@ with tab1:
     ["Default (XGBoost)", "TabPFN"]
     )
     model = None
-    if model_choice == "XGBoost":
+    if model_choice == "Default (XGBoost)":
         model = load_default_model()
         features = expected_features
     elif model_choice == "TabPFN":
@@ -312,6 +312,7 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
 
 
 
