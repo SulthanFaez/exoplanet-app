@@ -13,7 +13,7 @@ import pickle
 import io
 import threading
 
-
+@st.cache_resource
 def load_default_model():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     model_path = os.path.join(BASE_DIR, "xgbexoplanet.pkl")  # your trained model
@@ -52,7 +52,6 @@ st.title("🔭 Trigospace Exoplanet Classifier")
 #     model.devices_ = [torch.device("cuda")]        # devices list
 #     model.use_cuda = True
 #     return model
-@st.cache_resource
 def load_model_file(uploaded_file):
     return joblib.load(uploaded_file)
 
@@ -293,3 +292,4 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
