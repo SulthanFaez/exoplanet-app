@@ -34,14 +34,9 @@ def load_default_model():
     model.use_cuda = torch.cuda.is_available()
 
 # Start loading in background
-threading.Thread(target=load_default_model).start()
+load_default_model()
 
 st.title("🔭 Trigospace Exoplanet Classifier")
-
-if model:
-    st.success("Model loaded!")
-else:
-    st.info("Loading model in background… please wait.")
 
 
 # def load_default_model():
@@ -309,6 +304,7 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
 
 
 
