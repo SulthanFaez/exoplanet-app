@@ -7,4 +7,6 @@ joblib==1.5.2
 matplotlib==3.10.1
 seaborn==0.13.2
 tabpfn==2.2.1
+
+-f https://download.pytorch.org/whl/cu118/torch_stable.html
 torch==2.7.0+cu118
