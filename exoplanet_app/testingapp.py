@@ -13,10 +13,15 @@ import pickle
 import io
 import threading
 
-@st.cache_resource
+
 def load_default_model():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     model_path = os.path.join(BASE_DIR, "xgbexoplanet.pkl")  # your trained model
+    return joblib.load(model_path)
+
+def load_tabpfn_model():
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(BASE_DIR, "tabpfn_exoplanet.pkl")  # your trained model
     return joblib.load(model_path)
 
 # model = None
@@ -34,7 +39,7 @@ def load_default_model():
 #     model.use_cuda = torch.cuda.is_available()
 
 # Start loading in background
-model = load_default_model()
+# model = load_default_model()
 # threading.Thread(target=load_default_model, daemon=True).start()
 
 st.title("🔭 Trigospace Exoplanet Classifier")
@@ -52,6 +57,7 @@ st.title("🔭 Trigospace Exoplanet Classifier")
 #     model.devices_ = [torch.device("cuda")]        # devices list
 #     model.use_cuda = True
 #     return model
+@st.cache_resource
 def load_model_file(uploaded_file):
     return joblib.load(uploaded_file)
 
@@ -91,6 +97,18 @@ tab1, tab2, tab3 = st.tabs(["Predict", "Train / Retrain Model", "Load & Predict"
 
 with tab1:
     st.header("Predict Exoplanet Candidate")
+
+    model_choice = st.selectbox(
+    "Select Model for Prediction",
+    ["Default (XGBoost)", "TabPFN"]
+    )
+    if model_choice == "XGBoost":
+        model = load_default_model()
+        features = expected_features
+    elif model_choice == "TabPFN":
+        model = load_tabpfn_model()
+        features = expected_features
+        st.warning("Warning: Model will take a long time to predict")
 
     st.subheader("Enter All Features Manually")
     user_input = {}
@@ -292,4 +310,10 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
+
+
+
+
+
 
