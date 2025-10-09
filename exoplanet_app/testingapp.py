@@ -227,7 +227,7 @@ with tab2:
         from sklearn.linear_model import LogisticRegression
         C = st.number_input("Inverse Regularization Strength (C)", 0.01, 10.0, 1.0)
     elif model_choice == "TabPFN":
-        from tabpfn import TabPFNClassifier()
+        from tabpfn import TabPFNClassifier
 
 
     if st.button("Train Model"):
@@ -261,7 +261,7 @@ with tab2:
                 elif model_choice == "Logistic Regression":
                     clf = LogisticRegression(C=C, max_iter=500)
                 elif model_choice == "TabPFN":
-                    clf = TabPFNClassifier
+                    clf = TabPFNClassifier()
 
                 clf.fit(X_train, y_train)
                 joblib.dump(clf, f"{model_choice}_exoplanet_model.pkl")
@@ -319,6 +319,7 @@ with tab3:
 
             except Exception as e:
                 st.error(f"Error while loading model or predicting: {e}")
+
 
 
 
